@@ -1,0 +1,42 @@
+# Core dependencies
+azure-identity>=1.15.0
+python-dotenv>=1.0.0
+openai>=1.12.0
+pydantic>=2.0.0
+
+# Dependency conflict resolution
+# NOTE: There's a protobuf version conflict between packages:
+# - agentic-doc requires protobuf>=6.31.1,<7.0.0
+# - google-ai-generativelanguage requires protobuf<6.0.0dev,>=3.20.2  
+# - grpcio-status requires protobuf<6.0dev,>=5.26.1
+# You may need to choose one set of packages or find alternative solutions
+
+# Google AI package version pinning to avoid conflicts
+google-generativeai==0.8.5
+google-ai-generativelanguage==0.6.15
+
+# Option 1: For agentic-doc compatibility (uncomment if needed)
+# protobuf>=6.31.1,<7.0.0
+# agentic-doc>=0.3.1
+
+# Option 2: For google-ai-generativelanguage and grpcio-status compatibility (current)
+protobuf>=5.26.1,<6.0.0
+tenacity>=8.2.3,<9.0.0   # Required by google-genai
+
+# Graphiti MCP dependencies
+graphiti-core>=0.3.0
+
+# Agno framework dependencies
+agno>=0.3.0
+
+# MCP (Model Context Protocol) dependencies
+mcp>=1.0.0
+
+# FastMCP server dependencies
+fastmcp>=0.1.0
+
+# Optional dependencies for development/testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+mypy>=1.0.0
