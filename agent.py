@@ -3,12 +3,71 @@ import asyncio
 from agno.tools.mcp import MCPTools
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
+from agno.models.ollama import Ollama
+from dotenv import load_dotenv
+import os
+import time
+import sys
+import asyncio
+from agno.tools.mcp import MCPTools
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
 from dotenv import load_dotenv
 import os
 import time
 import sys
 
 load_dotenv()
+
+
+def get_model_choice():
+    """
+    Let the user choose between OpenAI and Ollama models
+    """
+    print("\n🤖 Choose your AI model provider:")
+    print("1. OpenAI (GPT models) - Requires API key")
+    print("2. Ollama (Local models) - Requires Ollama running locally")
+    
+    while True:
+        choice = input("\nEnter your choice (1 or 2): ").strip()
+        if choice in ['1', '2']:
+            return choice
+        print("❌ Invalid choice. Please enter 1 or 2.")
+
+
+def setup_model(choice):
+    """
+    Setup the appropriate model based on user choice
+    """
+    if choice == '1':
+        # OpenAI setup
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("❌ OPENAI_API_KEY not found in environment variables!")
+            print("Please set your OpenAI API key in the .env file")
+            return None
+        
+        print("🔧 Using OpenAI GPT-4o-mini model")
+        return OpenAIChat(id="gpt-4o-mini", api_key=api_key)
+    
+    elif choice == '2':
+        # Ollama setup
+        print("🔧 Available Ollama models:")
+        print("  • llama3.2 (Recommended)")
+        print("  • llama3.1")
+        print("  • mistral")
+        print("  • codellama")
+        print("  • qwen2.5")
+        print("  • phi3")
+        
+        model_name = input("\nEnter Ollama model name (or press Enter for llama3.2): ").strip()
+        if not model_name:
+            model_name = "llama3.2"
+        
+        print(f"🔧 Using Ollama model: {model_name}")
+        return Ollama(id=model_name)
+    
+    return None
 
 
 def fancy_poppins_print():
@@ -86,10 +145,19 @@ def fancy_poppins_print():
 
 async def main():
     fancy_poppins_print()
+    
+    # Let user choose model provider
+    model_choice = get_model_choice()
+    model = setup_model(model_choice)
+    
+    if model is None:
+        print("❌ Failed to setup model. Exiting.")
+        return
+    
     async with MCPTools(url="http://127.0.0.1:8000/sse", transport="sse") as mcp_tools:
         agent = Agent(
             name="Agno Memory Agent",
-            model=OpenAIChat(id="gpt-4.1-mini", api_key=os.getenv("OPENAI_API_KEY")),
+            model=model,
             tools=[mcp_tools],
             instructions="""
 You are Poppins, an intelligent assistant capable of managing and reasoning over structured memory using MCP tools. Introduce yourself with a friendly greeting and explain your capabilities. Use emojis to make your responses engaging and cheerful.
@@ -125,7 +193,11 @@ Respond clearly in markdown, and keep your answers informative but concise.""",
                     user_input, stream=True, stream_intermediate_steps=True
                 )
             except Exception as e:
-                print(f"\n:x: Error: {str(e)}")
+                print(f"\n❌ Error: {str(e)}")
+                if "Connection" in str(e) and model_choice == '2':
+                    print("💡 Tip: Make sure Ollama is running locally with: ollama serve")
+                elif "API key" in str(e) and model_choice == '1':
+                    print("💡 Tip: Check your OpenAI API key in the .env file")
 
 
 if __name__ == "__main__":

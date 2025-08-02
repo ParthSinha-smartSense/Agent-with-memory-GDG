@@ -3,6 +3,7 @@ agno==1.7.7
 annotated-types==0.7.0
 anyio==4.9.0
 attrs==25.3.0
+azure-identity>=1.15.0
 certifi==2025.7.14
 click==8.2.2
 distro==1.9.0
@@ -10,6 +11,7 @@ docstring_parser==0.17.0
 exceptiongroup==1.3.0
 gitdb==4.0.12
 GitPython==3.1.45
+graphiti-core>=0.3.0
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
@@ -44,12 +46,18 @@ typing-inspection==0.4.1
 typing_extensions==4.14.1
 uvicorn==0.35.0
 
-# Additional dependencies that may be needed
-# azure-identity>=1.15.0  # Uncomment if using Azure authentication
-# graphiti-core>=0.3.0    # Uncomment if using Graphiti (not in pip freeze output)
+# Ollama support
+ollama>=0.1.8
 
 # Optional dependencies for development/testing
 pytest>=7.0.0
 pytest-asyncio>=0.21.0
 black>=23.0.0
 mypy>=1.0.0
+
+# Neo4j dependencies (may be needed for graphiti-core)
+# neo4j>=5.0.0
+
+# Additional runtime dependencies that might be needed
+# fastapi>=0.100.0  # If using FastAPI features
+# uvloop>=0.17.0    # For better async performance on Unix systems
